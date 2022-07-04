@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
             child: TextField(
               controller: _controller,
               //ak sa zmeni vyhladavany pojem, premazu sa vysledky v zozname
-              onChanged: (String value) async {
+              onChanged: (String value) {
                 setState((){entries.clear();});
                 },
               decoration: const InputDecoration(
@@ -131,7 +131,9 @@ class _HomeState extends State<Home> {
                 margin: EdgeInsets.all(3.0),
                 //floating button, ktory spusta hladanie, mimo focusu na textfield je treba kliknut dvakrat, nevyrieseny bug
                 child: FloatingActionButton(onPressed: () async{
-                  setState((){getData(_controller.text);});},
+                  getData(_controller.text);
+                  setState((){});
+                  },
                   backgroundColor: Colors.amber,
                   child: const Icon(Icons.search),),
               )]
