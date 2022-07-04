@@ -6,7 +6,7 @@ class Details extends StatefulWidget {
 
   @override
   State<Details> createState(){
-    return _DetailsState(title, subtitle, isbn, price, image, link); //presun udajov do buildera UI
+    return _DetailsState(title, subtitle, isbn, price, image, link); //presun udajov do buildera
   }
 }
 
