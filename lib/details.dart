@@ -11,7 +11,7 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
-  //detaily
+  //detaily knihy
   late String title;
   late String subtitle;
   late String isbn;
