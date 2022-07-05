@@ -3,6 +3,7 @@ import 'details.dart'; //import obrazovky s detailmi knihy
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'; //package pre pracu s API volaniami
 
+
 void main() => runApp(MaterialApp(
   home: Home(),
   initialRoute: '/',
@@ -32,6 +33,7 @@ class Books {
 }
 
 class _HomeState extends State<Home> {
+  bool loadingAnimation = false;
   List<Books> entries = []; //zoznam vsetkych knih ziskanych cez API volanie
 
   late TextEditingController _controller; //ovladac vyhladavacieho pola
@@ -49,7 +51,7 @@ class _HomeState extends State<Home> {
   }
 
   //funkcia na ziskanie dat z API endpointu, value je vyhladavany pojem
-  void getData(value) async {
+  Future getData(value) async {
     var url =  Uri.parse('https://api.itbook.store/1.0/search/$value');
     var response = await get(url);
 
@@ -88,55 +90,56 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.amber,
       ),
         body: Column(
-            children: <Widget>[
-            Container(
-            padding: EdgeInsets.all(20.0),
-            margin: EdgeInsets.all(3.0),
-            child: TextField(
-              controller: _controller,
-              //ak sa zmeni vyhladavany pojem, premazu sa vysledky v zozname
-              onChanged: (String value) {
-                setState((){entries.clear();});
-                },
-              decoration: const InputDecoration(
-                suffixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-                labelText: 'Zadajte pojem'
-                ),
-              )),
-              //zoznam obsahujuci vysledky
-              //po kliknuti sa dostavame na druhu obrazovku s detailmi
-              Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: entries.length,
-                itemBuilder: (context, index){
-                  return Card(
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(
-                                builder: (context) => Details(title: entries[index].title, subtitle: entries[index].subtitle, isbn: entries[index].isbn, price: entries[index].price, image: entries[index].image, link: entries[index].link)));
-                      },
-                      title: Text(entries[index].title,style: const TextStyle(fontWeight: FontWeight.bold),),
-                      leading: Image.network(entries[index].image), //karta obsahuje aj obrazok, ten sa nacitava podla URI
-                    )
-                  );
-                },
-                )
-              ),
-              Container(
+              children: <Widget>[
+                Container(
                 padding: EdgeInsets.all(20.0),
                 margin: EdgeInsets.all(3.0),
-                //floating button, ktory spusta hladanie, mimo focusu na textfield je treba kliknut dvakrat, nevyrieseny bug
-                child: FloatingActionButton(onPressed: () async{
-                  getData(_controller.text);
-                  setState((){});
+                child: TextField(
+                  controller: _controller,
+                //ak sa zmeni vyhladavany pojem, premazu sa vysledky v zozname
+                  onChanged: (String value) {
+                    setState((){entries.clear();});
                   },
-                  backgroundColor: Colors.amber,
-                  child: const Icon(Icons.search),),
-              )]
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(),
+                    labelText: 'Zadajte pojem'
+                   ),
+                  )),
+                //zoznam obsahujuci vysledky
+                //po kliknuti sa dostavame na druhu obrazovku s detailmi
+                if (loadingAnimation) CircularProgressIndicator(),
+                Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: entries.length,
+                  itemBuilder: (context, index){
+                    return Card(
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(
+                                  builder: (context) => Details(title: entries[index].title, subtitle: entries[index].subtitle, isbn: entries[index].isbn, price: entries[index].price, image: entries[index].image, link: entries[index].link)));
+                        },
+                        title: Text(entries[index].title,style: const TextStyle(fontWeight: FontWeight.bold),),
+                        leading: Image.network(entries[index].image), //karta obsahuje aj obrazok, ten sa nacitava podla URI
+                      )
+                    );
+                  },
+                  )
+                ),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  margin: EdgeInsets.all(3.0),
+                  child: FloatingActionButton(onPressed: () async{ //vyriesene, len treba dat loading indikaciu
+                    setState(() {loadingAnimation = true;});
+                    await getData(_controller.text);
+                    setState((){loadingAnimation = false;});
+                    },
+                    backgroundColor: Colors.amber,
+                    child: const Icon(Icons.search),),
+                )]
         )
     );
   }
