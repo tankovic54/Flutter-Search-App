@@ -141,12 +141,23 @@ class _HomeState extends State<Home> {
                   onChanged: (String value) {
                     setState((){entries.clear(); searchValue = value;});
                   },
-                  decoration: const InputDecoration(
-                    suffixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                    labelText: 'Zadajte pojem'
+                  decoration: InputDecoration(
+                    suffixIcon:
+                      Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 5.0, 0.0),
+                          child: CircleAvatar(
+                              backgroundColor: Colors.amber,
+                              radius: 10,
+                              child: IconButton(
+                                onPressed: () async{await Future.wait([getData(_controller.text)]);},
+                                icon: const Icon(Icons.search), color: Colors.white,),
+                          )
+                      ),
+                      border: const OutlineInputBorder(),
+                      labelText: 'Zadajte pojem'
                    ),
-                  )),
+                  )
+                ),
                 //zoznam obsahujuci vysledky
                 //po kliknuti sa dostavame na druhu obrazovku s detailmi
                 if (loadingAnimation) const CircularProgressIndicator(),
@@ -170,15 +181,7 @@ class _HomeState extends State<Home> {
                   },
                   )
                 ),
-                Container(
-                  padding: const EdgeInsets.all(20.0),
-                  margin: const EdgeInsets.all(3.0),
-                  child: FloatingActionButton(onPressed: () async{ //vyriesene, len treba dat loading indikaciu
-                    await Future.wait([getData(_controller.text)]);
-                    },
-                    backgroundColor: Colors.amber,
-                    child: const Icon(Icons.search),),
-                )]
+               ]
         )
     );
   }
